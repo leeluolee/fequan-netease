@@ -1,0 +1,148 @@
+/* mass入口文件 */
+@import 'http://rawgit.com/leeluolee/mass/master/mass/index.mcss';
+
+
+$pulse(0.2);
+
+.animated.loop{
+  $animation-iteration-count: infinite;
+}
+
+.text-info{
+  color: left;
+}
+
+
+
+
+.reveal .slides { 
+  [data-background]{
+    h2{
+      color: #e1e1e1;
+    }
+  }
+  .img-void{
+    display: inline-block;
+    border:none;
+    $box-shadow: none;
+    vertical-align: middle;
+  }
+
+  // . function
+  .f-tl{
+    text-align: left;
+  }
+  .f-tl1{
+    @extend .f-tl;
+    padding-left: 20%;
+  }
+  .f-tr{
+    text-align: right;
+  }
+  .f-nt{
+    text-transform: none;
+  }
+  img.fragment.gray.visible{
+    &::after{
+      content: attr(data-text);
+    }
+    $filter: grayscale(100%) brightness(0.5) blur();
+    opacity: 0.9;
+    filter: gray;
+  }
+  section{
+
+    table td strong, .danger{
+      color: #ea6153;
+    }
+
+    .h1-lt{
+      color: #2c3e50;
+      text-shadow: 0px 0px 10px #fff,0px 0px 20px #fff;
+    }
+
+
+
+    .hlt{
+      display: inline-block;
+      padding: 5px;
+      background-color: #d33682;
+      color: white;
+    }
+    .hlt-gray{
+      background-color: #002b36;
+      $border-radius: 8px;
+      padding: 10px;
+      opacity: .7;
+    }
+    .hlt-abs{
+      position: absolute ;
+      top: 200px;
+      right: 200px;
+      transform: rotate(36deg);
+      font-size: 64px;
+    }
+    .img-void{
+      display:inline-block;
+      border:none;
+      -webkit-box-shadow:none;
+      box-shadow:none;
+      margin: 0;
+    }
+
+
+
+    .hlt-cas{ }
+    .m-compare{
+      $gap = 60%;
+      code{
+        font-size: 16px;
+      }
+      td{
+        padding: 0px;
+      }
+      pre{
+        width: 100% + $gap;
+        margin-left: -$gap;
+      }
+      td:last-child pre{
+        margin-right: -$gap;
+        margin-left: 0;
+      }
+      td.arrow{
+        padding: 0;
+        vertical-align: middle;
+        font-size: 1.5em;
+        width: 20px;
+      }
+      .icon-right-open{
+        font-size: 40px;
+        vertical-align: middle;
+      }
+    }
+  }
+}
+
+
+.gap-top{
+  margin-top: 20px;
+}
+.lirt{
+
+  p, blockqupte{
+    margin-left: 10px;
+    overflow: hidden;
+    text-align: left;
+  }
+  img{
+    float: left;
+  }
+}
+
+ul.table{
+  display: table;
+}
+ul.table li{
+  display: table-cell;
+}
+

@@ -1,0 +1,1428 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>漫谈Web前端的『组件化』</title>
+
+		<meta name="description" content="漫谈Web前端的『组件化』">
+		<meta name="author" content="leeluolee">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/serif.css" id="theme">
+		<link rel="stylesheet" href="css/bootstrap.css">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/solarized_light.css">
+		<link rel="stylesheet" href="fontello/css/fontello.css">
+		<link rel="stylesheet" href="css/index.css">
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+<body><div class="reveal"><div class="slides">
+
+
+<section data-markdown>
+	<script type="text/template">
+	## 漫谈Web前端的『组件化』
+  ### What, Why, How <!-- .element: class="fragment danger" data-fragment-index="2" -->
+	</script>
+</section>
+
+
+<section data-markdown style='text-align:left'>
+	<script type="text/template">
+
+## Hi, 我叫 郑海波
+
+-----
+
+<span class='icon-github'></span> [@leeluolee](http://github.com/leeluolee)
+
+<span class='icon-sina-weibo'></span> [@拴萝卜的棍子](http://weibo.com/luobolee)
+
+<span class='icon-location'></span> 网易杭州 - 前端技术部
+
+<img src='assert/me.jpg' class='fragment me grow' style='position:absolute; right: 20px; top: 20px' >
+
+
+	</script>
+</section>
+
+<section data-markdown>
+  <script type="text/template">
+
+## <i class='icon-docs'></i>Agenda
+
+1. 组件
+2. 数据驱动的组件框架
+3. 实践经验分享
+
+  </script>
+</section>
+
+<section data-markdown>
+  <script type="text/template">
+  ## 什么是组件？
+
+  <span class='fragment danger'>component</span>
+  <span class='fragment'>, widget</span>
+  <span class='fragment'>, module</span>
+  <span class='fragment'>, plugin</span>
+  <span class='fragment'>...etc</span>
+  </script>
+</section>
+<section data-markdown >
+
+## Component
+
+> "A component in the Unified Modeling Language represents a modular part of a system, that encapsulates its content and whose manifestation is replaceable within its environment. A component defines its behavior in terms of provided and required interfaces"
+
+	</script>
+</section>
+
+<section>
+
+
+<img width='40%' src='http://ww1.sinaimg.cn/large/6252205cgw1ex8sidgzfqj20go0lqq51.jpg'/>
+
+</section>
+
+
+<section >
+
+<h3 class='icon-code'>Tab</h3>
+
+<div class='fragment' >
+
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist" style='border-bottom: 1px solid #ccc;'>
+    <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
+    <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Profile</a></li>
+    <li role="presentation"><a href="#messages" aria-controls="messages" role="tab" data-toggle="tab">Messages</a></li>
+    <li role="presentation"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="home">
+    	Tab页内容...blablabla
+    <div>
+  </div>
+
+</div>
+
+<pre class='fragment'>
+<code>
+<div id="tabs">
+  <ul>
+    <li><a href="#tabs-1">Nunc tincidunt</a></li>
+    <li><a href="#tabs-2">Proin dolor</a></li>
+    <li><a href="#tabs-3">Aenean lacinia</a></li>
+  </ul>
+  <div id="tabs-1"> tab1 content </div>
+  <div id="tabs-2"> tab2 content </div>
+  <div id="tabs-3"> tab3 content </div>
+</div>
+</code>
+</pre>
+</section>
+
+
+
+
+<section data-markdown >
+
+	<script type="text/template">
+
+## jQuery
+
+```js
+
+$( ".selector" ).tabs( "option", "show", { 
+
+	effect: "blind", 
+
+	duration: 800 
+});
+
+```
+
+	</script>
+</section>
+
+<section data-markdown >
+
+	<script type="text/template">
+
+## NEJ
+
+```js
+
+ 
+var tb = p._$$Tab._$allocate({
+
+    list: e._$getChildren( e._$get('box')),
+
+    index:1,
+
+    onchange:function(_event){
+
+    }
+});
+
+tb._$go(2);
+
+
+```
+	</script>
+</section>
+
+<section data-markdown>
+	<script type='text/template'>
+
+## YUI
+
+```js
+
+YUI().use('tabview', function(Y) {
+
+    var tabview = new Y.TabView({
+        children: [{
+            label: 'foo',
+            content: '<p>foo content</p>'
+        }, {
+            label: 'bar',
+            content: '<p>bar content</p>'
+        }, {
+            label: 'baz',
+            content: '<p>baz content</p>'
+        }]
+    });
+
+    tabview.render('#demo');
+
+});
+
+```
+	</script>
+</section>
+
+<section data-markdown>
+  <script type="text/template">
+
+## 实现不统一， 使用不统一
+
+  </script>
+</section>
+
+
+<section data-markdown><script type="text/template">
+
+![](./assert/webcomponents.png)
+
+## Web Component
+
+<i class='icon-quote-left'></i>2011年,由Alex Russell提出<i class='icon-quote-right'></i>
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+## <img src="./assert/webcomponents.png" width=120 class='img-void' alt="" />是系列规范
+
+- Custom Element: 自定义HTML元素<!-- .element: class="fragment grow highlight-red"  -->
+
+- shadow DOM: 封装<!-- .element: class="fragment grow highlight-red"  -->
+
+- HTML Imports: 打包一切
+
+- HTML Template: Lazy的DOM模板
+
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+
+## Custom Element
+
+```html
+<x-foo> Custom Elememnt </x-foo>
+```
+<!-- .element: class="fragment"  -->
+
+
+
+```js
+var xFoo = document.createElement('x-foo');
+```
+<!-- .element: class="fragment"  -->
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+## 定义新元素
+
+```js
+var XFooProto = Object.create(HTMLElement.prototype);
+
+// 生命周期相关
+XFooProto.readyCallback = function() {
+  this.textContent = "I'm an x-foo!";
+};
+
+// 设置 JS 方法
+XFooProto.foo = function() { alert('foo() called'); };
+
+var XFoo = document.register('x-foo', {prototype: XFooProto});
+```
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+<h2 class='f-tnr  icon-magic '>Vanilla JS + Vanilla DOM!</h2>
+
+</script></section>
+
+<section>
+
+<h2>Shadow Dom</h2>
+
+<video id="video" controls="" width='6' preload="none" mediagroup="myVideoGroup" poster="http://media.w3.org/2010/05/sintel/poster.png">
+      <source id="mp4" src="http://media.w3.org/2010/05/sintel/trailer.mp4" type="video/mp4">
+      <source id="webm" src="http://media.w3.org/2010/05/sintel/trailer.webm" type="video/webm">
+      <source id="ogv" src="http://media.w3.org/2010/05/sintel/trailer.ogv" type="video/ogg">
+      <p>Your user agent does not support the HTML5 Video element.</p>
+</video>
+
+
+
+</section>
+
+<section data-markdown><script type="text/template">
+
+<span class='icon-wrench'></span>DevTool > Settings > General> show shadow DOM
+
+![shadow dom](./assert/shadow-dom.jpg)
+<!-- .element: class="fragment"  -->
+
+</script></section>
+
+<section data-markdown><script type="text/template" style='font-size:16px;'>
+
+<div id='shadowdom'><h3>Light DOM</h3></div>
+
+<h3 class='fragment'>h3 outer</h3>
+
+
+```html
+<div><h3>Light DOM</h3></div>
+
+<script>
+var node = document.querySelector('div');
+
+var root = node.createShadowRoot();
+
+root.innerHTML = 
+		'<style>h3{ color: red; }</style>' + 
+		'<h3> h3 in shadowRoot </h3>';
+</script》
+
+```
+
+
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+<b class='icon-attach'></b>[Are We Componentized Yet?](http://jonrimmer.github.io/are-we-componentized-yet/)
+
+![webcomponents](./assert/caniuse.png)
+
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+
+<h2 class='icon-emo-happy'> Advantage</h2>
+
+- 一致性: Vanlila DOM
+- 可移植性
+- 所写即所得
+- __浏览器内建的生命周期__
+
+
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+<h2 class='icon-emo-unhappy'> Disadvantage</h2>
+
+- Not Data Driven
+- Imprective
+
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+
+## Data-Binding
+
+```js
+var tabPane = document.createElement('tab-pane');
+
+tabPane.setAttribute('title', 'hello');
+tabPane.setAttribute('content', 'hello');
+
+tab.appendChild(tabPane);
+
+```
+
+### VS
+
+```js
+
+tabs.push({
+	title: 'hello',
+	content: 'hello'
+})
+
+```
+
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+
+
+## Declarative VS Imprective 
+
+<nav class='fragment grow'>
+<ul class="pagination">
+  <li><a href="#">&laquo;</a></li>
+  <li class='active'><a href="#">1</a></li>
+  <li><a href="#">2</a></li>
+  <li><a href="#">3</a></li>
+  <li><a href="#">4</a></li>
+  <li><a href="#">5</a></li>
+  <li><a href="#">&raquo;</a></li>
+</ul>
+</nav>
+
+
+
+
+
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+
+
+```html
+<pagination 
+	current={current} total={maxCount/20} 
+	on-nav={this.nav(1)}></pagination>
+<pagination 
+	current={current} total={maxCount/20} 
+	on-nav={this.nav(2)}></pagination>
+```
+<!-- .element: class="fragment"  -->
+
+
+
+### VS
+
+
+```html
+<bootstrap-pagination id='pagination'></bootstrap-pagination>
+<script>
+// 获取元素
+var pagination = document.querySelector('#pagination');
+// 绑定事件
+pagination.addEventListener('pagination-nav', function(event){
+	// blablablabal
+})
+// 设置属性
+$.ajax('/blogs').then(function( json ){
+	pagination.setAttribute('current', 0)
+	pagination.setAttribute('total', json.length / 20)
+})
+
+</script》
+```
+<!-- .element: class="fragment"  -->
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+
+"是__数据驱动__允许将两个组件通过__声明式编程__建立内在联系"
+
+- Data-Driven是因(gong)
+
+- Declarative是果(shou)
+
+
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+
+## 视图层本就是由数据所驱动
+
+</script></section>
+
+<section class='mdv'>
+
+<img src='./assert/mdv.jpg' />
+
+<div class='u-rect fragment' style=''>stories</div>
+<div class='u-rect fragment' style=''>stories[1]</div>
+<div class='u-rect fragment' style=''>stories[1].vote</div>
+<div class='u-rect fragment' style='' >stories[1].comments.length</div>
+
+</section>
+
+<section data-markdown><script type="text/template">
+
+### 矛盾在于DOM操作是碎片的命令式 <!-- .element: class="fragment"  -->
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+<h2 class=' icon-emo-unhappy'></h2>
+
+## 这不是Web Component的错
+
+<p class='fragment'>"Foundation 与 Framework 职责是不同的"</p>
+
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+### We Need 
+<h2 class='fragment grow danger icon-inbox'>Framework</h2>
+
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+
+<h1 class='f-tnr danger fragment' style='font-size:4em'>v = f(d)</h1> 
+
+<h4 class='fragment' >何种框架技术满足这个公式 ?</h4>
+
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+答案是 ......
+
+----
+
+<div class='fragment '>
+<h3 class='icon-emo-sunglasses danger'>字符串模板</h3>
+
+<img src='./assert/template.png' width='80%' />
+</div>
+
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+
+```html
+{%if login %} 
+	<h2>{{user.name}} </h2>
+{% endif %}
+```
+
+<h3> + </h3>
+
+```js
+{
+	login: true,
+	user: {
+		name: '@leeluolee'
+	}
+}
+```
+
+<h3 class='fragment grow danger'>===</h3>
+
+```html
+<h2>@leeluolee</h2>
+```
+
+</script></section>
+
+
+
+<section data-markdown><script type="text/template">
+
+## Advantage.
+
+- Simple Usage ( compile + render )<!-- .element: class="fragment"  -->
+
+- Natrual Isomorphic( 100% dom 无关 )<!-- .element: class="fragment"  -->
+
+- Powerful Syntax<!-- .element: class="fragment"  -->
+
+- 100% Stateless "v=f(d)"<!-- .element: class="fragment danger"  -->
+
+- "High Performance" <!-- .element: class="fragment danger"  -->
+
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+## Disadvantage.
+
+- Hidden danger ( XSS, invalid tag... etc )<!-- .element: class="fragment danger"  -->
+
+- 100% Stateless (??)<!-- .element: class="fragment danger"  -->
+
+- "Low Performance" (???!) <!-- .element: class="fragment danger"  -->
+
+
+</script></section>
+
+<section data-markdown data-background='./assert/background.jpg' data-background-transition='zoom'>
+
+## MDV technology to rescue
+##### [Model Driven View]()
+
+  </script>
+</section>
+
+<section data-markdown><script type="text/template">
+
+### MDV
+
+> A proposal for extending HTML and the DOM APIs to support a sensible separation between the UI (DOM) of a document or application and its underlying data (model). Updates to <b class='fragment grow danger'>the model are reflected in the DOM</b> and  <b class='fragment grow danger'>user input into the DOM is immediately assigned to the model</b>
+	
+_from Google_
+
+
+</script></section>
+
+
+
+<section data-markdown><script type="text/template">
+
+# <img src='./assert/polymer.svg' width='20%' class='img-void' /> Polymer
+
+### Everything is Component
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+![](http://ww1.sinaimg.cn/large/6252205cgw1exazohy3tij20ox0jv76v.jpg)
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+```html
+<link rel="import"
+      href="bower_components/polymer/polymer.html">
+<!-- import the iron-input custom element -->
+<link rel="import"
+      href="bower_components/iron-input/iron-input.html">
+
+<dom-module id="editable-name-tag">
+
+  <template>
+    <p>
+    This is a <strong>{{owner}}</strong>'s editable-name-tag.
+    </p>
+    <!-- iron-input exposes a two-way bindable input value -->
+    <input is="iron-input" bind-value="{{owner}}"
+      placeholder="Your name here...">
+  </template>
+
+  <script>
+    Polymer({
+      is: "editable-name-tag",
+      properties: {
+        owner: {
+          type: String,
+          value: "Daniel"
+        }
+      }
+    });
+  </script》
+
+</dom-module>
+```
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+
+
+#<img src='./assert/react.svg' width='20%' class='img-void' /> React
+
+### Nothing But Component
+<!-- .element: class="fragment"  -->
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+> "I definitely think it’s the wrong programming paradigm. I really hope that [web components] do not succeed"
+
+ from [Pete Hunt](https://twitter.com/floydophone)
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+### Share Context Between <br/> <span class='danger'>Logic</span> And  <span class='danger'>View</span>
+
+
+![](./assert/react-demo.jpg)
+
+
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+## Virtual DOM
+
+- 脏检查发生在View层抽象Virtual DOM上
+- Diff计算差异并映射到View层, 实现__局部更新__
+- View层可以独立实现到各平台 (依赖JS Binding)
+- 不依赖模板, 配合JSX可以有类似书写体验.
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+## One Way Data-Flow
+
+- Two-Way Binding 不再被认为是最佳实践
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+
+## Huge
+
+- Foudation ( React Native, Flux, Immutable.js..etc)
+
+- Community ( 3w+ stars , 5000+ issues )
+
+- Size... ( 40kb Gzip & without JSX )
+
+
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+
+# <img src='./assert/angularjs-logo.png' width='20%' class='img-void' />  Angular
+
+<p class='danger fragment'><span class=' icon-quote-left'></span> The next generation JavaScript language that will kill ALL the frameworks!<span class='icon-quote-right'></span></p>
+
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+
+![pr](http://ww4.sinaimg.cn/large/6252205cgw1exb0vrfx98j20r60c5jtf.jpg)
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+
+## Feature
+
+- Dirty Check(Pull)<!-- .element: class="fragment" style='font-weight:bold'  -->
+- 100% 的 Plain Object<!-- .element: class="fragment" style='font-weight:bold'  -->
+- Complex Concepts(directive,service,controller..etc)<!-- .element: class="fragment" style='font-weight:bold'  -->
+- Huge Community<!-- .element: class="fragment" style='font-weight:bold'  -->
+- Everything Except Componenet (v1.x)<!-- .element: class="fragment" style='font-weight:bold'  -->
+- Low Performance (maybe)<!-- .element: class="fragment" style='font-weight:bold'  -->
+
+</script></section>
+<section data-markdown>
+  <script type='text/template'>
+
+# Regularjs 
+
+Create data-driven <b class='danger'> Components </b> based on <b class='danger'> [__Living Template__](http://leeluolee.github.io/2014/10/10/template-engine/) </b> 
+
+  </script>
+</section>
+
+<section data-markdown><script type="text/template">
+
+![xx](assert/search.png)
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+## Living Template
+
+![Living](http://ww3.sinaimg.cn/large/6252205cgw1exb3mrzxicj20g8090t9h.jpg)
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+### Living Template 是一种组合技术 
+
+- String-based Template的头
+- 类似React的身体
+- DOM-based Template的尾巴
+
+[http://leeluolee.github.io/2014/10/10/template-engine/](http://leeluolee.github.io/2014/10/10/template-engine/)
+
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+### Define A Component
+
+![http://ww3.sinaimg.cn/large/6252205cgw1exb324ymdxj20i60c0gno.jpg](http://ww3.sinaimg.cn/large/6252205cgw1exb324ymdxj20i60c0gno.jpg)<!-- .element: class="fragment" style='width:90%'  -->
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+## Declarative Way
+
+```html
+
+<div class='example-container'>
+  <pophover title='pophover title' placement='bottom'>
+    pophover content
+  </pophover>
+</div>
+
+```
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+## Imprective Way
+
+```
+
+let pophover = new Pophover({
+
+	data: {
+		title: 'pophover title',
+		placement: 'bottom'
+	},
+
+	$body: 'pophover content'
+
+}).$inject('.example-container')
+
+```
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+### 声明式(标签化)只是『接口』的一种形式
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+## Feature
+
+- Safe<!-- .element: class="fragment" style='font-weight:bold'  -->
+
+- 20KB(Gzip)<!-- .element: class="fragment" style='font-weight:bold'  -->
+
+- Living Template( String-based + Dom-based )<!-- .element: class="fragment"  -->
+
+- Dirty Check(性能?)<!-- .element: class="fragment"  -->
+
+- Composite Component( != 标签化 )<!-- .element: class="fragment"  -->
+
+- Fully Tested( IE6+ )<!-- .element: class="fragment"  -->
+
+- Widely Used in 我厂( 网易杭州 )<!-- .element: class="fragment"  -->
+
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+## MDV总结: 框架的Model层
+
+- Pull: Regular, Angular
+	- 潜在性能问题
+	- Stateless的Plain Object
+- Push: Polymer(Object.observe), Vue(Object.defineProperty)
+	- 高效的模型(MayBe)
+	- 非100%的Plain Object, 基于binding.
+- Pull(view): React
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+## 纯粹的`v = f(d)` 止步于DOM 操作.
+
+</script></section>
+
+
+
+<section data-markdown><script type="text/template">
+
+## MDV总结: 框架的Foudation
+
+- Polymer: 基于Web Component
+- Angular: 基于DOM的解析(innerHTML)+自建的编译(link)流程
+- React: 自有流程
+- Regular: 自有流程
+
+</script></section>
+
+<section data-markdown data-background='#4BACC6' data-background-transition='concave'> <script>
+
+## regular-register
+
+将Component 转化为真正的Custom Element !!
+
+[https://github.com/regularjs/customelements-register](https://github.com/regularjs/customelements-register )
+
+</script></section>
+
+
+<section data-markdown data-background='#002b36' data-background-transition='zoom'>
+	<script type='text/template'>
+
+<h1 style='color:#fff'> <span class='icon-emo-happy'></span> Thank You</h1>
+
+
+	</script>
+</section>
+
+<section data-markdown data-background='#4BACC6' data-background-transition='zoom'><script type="text/template">
+
+## 组件实践
+
+<p class='icon-bell fragment danger'>与具体框架无关</p>
+
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+
+### 永远不要提前将业务组件化
+
+#### 组件是重构的结果，非提前设计所能及也<!-- .element: class="fragment" style='font-weight:bold'  -->
+
+- 组件化前, 共处一个Context<!-- .element: class="fragment" style='font-weight:bold'  -->
+
+- 组件化后, 灵活性降低，分处于不同Context，通过事件和Data Flow维系<!-- .element: class="fragment"  -->
+
+
+
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+
+## 组件封装
+
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+
+### 组件分类
+
+- Non Visual: 只有业务逻辑，没有View
+	- 如带翻页列表: 抽象业务逻辑, 一般由其子类实现View
+	- 如`<polymer-ajax></polymer-ajax>`: 纯功能,没有View
+
+- Visual: 业务逻辑 + View
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+> Non Visual Component is Easy ,Visual Component is Hard
+
+- 组件最大的不稳定性来自于展现层(模板)<!-- .element: class="fragment"  -->
+- 继承或混入可以解决成员函数和变量的扩展复用, 但无法解决模板的扩展复用<!-- .element: class="fragment"  -->
+
+</script></section>
+
+<section data-markdown data-background='#9BBB59' data-background-transition='zoom'> <script>
+
+
+## 如何解决模板的复用问题？
+
+
+</script></section>
+
+
+
+<section data-markdown><script type="text/template">
+
+## 组合
+
+> A + B =  AB
+
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+### 组合的野生例子: ul + li
+
+
+属于无序列表的li元素
+
+```html
+<ul class="pagination">
+  <li><a href="">Prev</a></li>
+  <li><a href="">1</a></li>
+  <li><a href="">...</a></li>
+  <li><a href="">10</a></li>
+  <li><a href="">Next</a></li>
+</ul>
+```
+
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+### 组合的野生例子: ol + li
+
+
+属于有序列表的li元素
+
+```html
+<ol class="rank">
+  <li><a href="">1</a></li>
+  <li><a href="">2</a></li>
+  <li><a href="">3</a></li>
+  <li><a href="">4</a></li>
+  <li><a href="">5</a></li>
+</ol>
+```
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+## 组件亦是如此
+
+```html
+<dropdown-button title='向上的箭头'  style=success dropup on-select={}>
+  <select-item header>我是标题</select-item>
+  <select-item><span class='icon'></span>我是列表项1</select-item>
+  <select-item divider />
+  <select-item disabled>我是禁止的</select-item>
+  <select-item>我是列表项2</select-item>
+  <select-item divider />
+  <select-item>我是列表项3</select-item>
+</dropdown-button>
+```
+
+- select-item的职责: 响应点击、 失效等行为
+- dropdown-button的职责: 展现样式, 抛出select事件
+
+
+</script></section>
+
+
+
+<section data-markdown><script type="text/template">
+
+## 组合可以更复杂...
+
+```html
+<modal title='筛选器'>
+	<tab>
+	  <tab.pane title='列表筛选'  selected>
+	    <text-search select={select}   ref=list ></text-search>
+	  </tab.pane>
+	  <tab.pane title='文本筛选' > 
+	    <text-filter match ={match}   ref=text ></text-filter>
+	  </tab.pane>
+	  <tab.pane title='条件筛选' >
+	    <condition-filter condition={condition}  measures={measures} ref=condition ></condition-filter>
+	  </tab.pane>
+	  <tab.pane title='高级筛选' >
+	    <advanced-filter top={top} measures={measures} ref=advanced ></advanced-filter>
+	  </tab.pane>
+	</tab>
+</modal>
+
+```
+
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+## 组合: 只提供能力
+
+```html
+<div class="item {mark.labels.length? 'z-act':''}">
+ <dropable name='mark.labels' direct=y 
+  on-toucheddrop={this.drop('mark.labels', $event)}  >
+  <div class="box">
+    {#list mark.labels as lpill}
+      <dragable target={TARGET_PILL} on-dragend='dragend' >
+        <pill pill={lpill} index={lpill_index} isolate = 1 />
+      </dragable>
+    {/list}
+  </div>
+</dropable>
+</div>
+
+```
+
+- dropable: 为 包裹区域 提供放置能力<!-- .element: class="fragment"  -->
+- dragable: 为 包裹区域 提供拖拽能力<!-- .element: class="fragment"  -->
+
+
+</script></section>
+
+
+<section data-markdown data-background='#4BACC6' data-background-transition='concave'> <script>
+
+## DEMO
+
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+
+
+## One Way Data-Flow
+
+![单向数据流](http://ww2.sinaimg.cn/large/6252205cgw1exb4b1yitwj20e40fcq5u.jpg)
+<!-- .element: class="fragment" style='font-weight:bold'  -->
+
+
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+
+### 为何我们需要单向数据流的组件架构
+
+- 可控性
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+## Flux
+
+<p class='fragment'>瞬间被后浪排死在沙滩的前浪</p>
+
+![](http://ww4.sinaimg.cn/large/6252205cgw1exbij5pqctj21040joadn.jpg)
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+## Redux
+
+#### State Manager, Only 2KB (gzip)
+
+[http://rackt.org/redux/](http://rackt.org/redux/)
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+### 流程
+
+1. Store.dispatch(Action) // 派发Action
+2. Middleware(Action) // 处理异步逻辑、Log等
+3. Reducer(State, Action)
+4. View = F(State);
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+### Example 
+
+```js
+import { createStore } from 'redux';
+// reducer
+function counter(state = 0, action) {
+  switch (action.type) {
+  case 'INCREMENT':
+    return state + 1;
+  case 'DECREMENT':
+    return state - 1;
+  default:
+    return state;
+  }
+}
+// Its API is { subscribe, dispatch, getState }.
+let store = createStore(counter);
+
+// You can subscribe to the updates manually, or use bindings to your view layer.
+store.subscribe(() =>
+  console.log(store.getState())
+);
+
+store.dispatch({ type: 'INCREMENT' });
+
+```
+
+<!-- .element: class="fragment" style='font-weight:bold'  -->
+
+
+
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+
+<h2 class=' icon-magic'>让我们翻译成VanillaJS...</h2>
+
+
+## `state++`
+
+<!-- .element: class="fragment" style='font-weight:bold'  -->
+
+### 先苦后甜, 还是先甜后『狗带』
+<!-- .element: class="fragment"   -->
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+<h2 class=' icon-file-powerpoint'>三原则</h2>
+
+- 规定State本身是不变数据类型 <!-- .element: class="fragment"   -->
+- 规定Reducer为纯函数 <!-- .element: class="fragment"   -->
+- 规则只能有单个Store(它整合了Dispather) <!-- .element: class="fragment"   -->
+
+__从数据类型、Mutation、数据源、Data-Flow保证了状态本身的可预测性(predictable)<!-- .element: class="fragment danger"   -->__
+
+
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+### Redux与JS的矛盾点 
+
+> JS中的Object，Array等是可变数据结构 
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+## 可变数据
+
+```js
+
+var a = {selected: true, content: 'hello'};
+
+// action 1
+a.selected = false;
+
+// action 2
+
+a.selected = true;
+
+a === a;
+
+```
+
+_往往你在调试action 1时， 数据已经被action 2改变 _
+
+</script></section>
+
+
+<section data-markdown><script type="text/template">
+
+## 不可变数据
+
+```js
+
+var a = {selected: true, content: 'hello'};
+
+// action1
+var a1 = Object.assign({}, a , {
+  selected: true
+}) 
+
+a !== a1
+
+```
+
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+### 深层对象修改
+
+- `deepSet(state, 'blogs[1].title', 'hello')`
+
+<img src='./assert/im.png' width='40%' />
+
+</script></section>
+
+
+<section data-markdown data-background='#4BACC6' data-background-transition='concave'> <script>
+
+### 当我们把每一步的数据都保存下来 
+
+
+
+#<span class='icon-inbox'></span> Time Machine!<!-- .element: class="fragment"   -->
+	</script>
+</section>
+
+<section data-markdown><script type="text/template">
+
+
+## 如何结合特定的View层框架
+
+### `store.subcribe(callback)` 
+<!-- .element: class="fragment danger"   -->
+
+<p class="icon-emo-thumbsup"> 特别适合基于Pull流程(脏检查)的View层框架</p>
+
+
+</script></section>
+
+<section data-markdown><script type="text/template">
+
+
+### Regular<span class='danger fragment'>< ReduxMixin ></span>Redux
+
+```js
+var ReduxMixin = {
+	events: {
+		$config: function(){
+			store.subcribe( function(){
+
+					this.mapStateToData( store.getState(), this.data);
+					this.$update()// 触发脏检查
+
+				}.bind(this) )
+		}
+	},
+	mapStateToData: function(){
+		throw Error('You need implement mapStateToData')
+	}
+}
+ReportApp.implement( ReduxApp );
+
+```
+<!-- .element: class="fragment" style='font-weight:bold'  -->
+
+</script></section>
+
+
+<section data-markdown data-background='#002b36' data-background-transition='zoom'>
+	<script type='text/template'>
+
+<h1 style='color:#fff'> <span class='icon-emo-happy'></span> Thank You</h1>
+
+
+	</script>
+</section>
+
+
+
+<script src="lib/js/head.min.js"></script>
+<script src="js/reveal.js"></script>
+
+<script>
+
+	// Full list of configuration options available at:
+	// https://github.com/hakimel/reveal.js#configuration
+	Reveal.initialize({
+		controls: true,
+		progress: true,
+		history: true,
+		center: true,
+
+		transition: 'slide', // none/fade/slide/convex/concave/zoom
+		fragments: true,
+
+
+		// Optional reveal.js plugins
+		dependencies: [
+			{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+			{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+			{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+			{ src: 'plugin/highlight/highlight.js', async: true, condition: function() { 
+
+				return true }, callback: function() { 
+				hljs.initHighlightingOnLoad(); 
+			} },
+			{ src: 'plugin/zoom-js/zoom.js', async: true },
+			{ src: 'plugin/notes/notes.js', async: true }
+		]
+	});
+
+	Reveal.addEventListener( 'ready', function( event ) {
+		console.log('hdahda')
+		var root = document.querySelector('#shadowdom').createShadowRoot();
+		console.log(root)
+		root.innerHTML = '<style>h3{ color: red; }</style>' + 
+		                 '<h3>h3 in shadowRoot</h3>';
+	} );
+
+</script>
+
+
+</div></div>
+</body>
+</html>
+
+
+
